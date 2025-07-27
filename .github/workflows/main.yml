@@ -1,0 +1,43 @@
+name: Build Electron App
+
+on:
+  push:
+    branches: [ main ]  # adapte si tu travailles sur une autre branche
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Electron app
+        run: npm run build
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: letal-installer
+          path: dist/*.exe
+          compression-level: 9
+          if-no-files-found: error
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: "v${{ github.run_number }}"
+          name: "Release v${{ github.run_number }}"
+          files: dist/*.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
