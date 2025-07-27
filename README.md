@@ -14,3 +14,6 @@
 - Working searchbar
 - Integrate other local game providers 
 - Store to displays weekly monthly best games 
+
+
+## Releases
