@@ -49,8 +49,10 @@ function createWindow() {
     mainWindow.webContents.openDevTools()
   } else {
     console.log('Production mode detected, loading from dist...')
-    mainWindow.loadFile(path.join(__dirname, '../dist/index.html'))
-    mainWindow.webContents.openDevTools();
+    const distPath = path.join(__dirname, '../dist/index.html')
+    console.log('Loading from:', distPath)
+    mainWindow.loadFile(distPath)
+    mainWindow.webContents.openDevTools(); // Commenté pour la production
   }
 
   // Show window when ready
