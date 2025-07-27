@@ -35,11 +35,6 @@ export default function GameCard({ game, onToggleFavorite }: GameCardProps) {
     }
   }
 
-  const handleToggleFavorite = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    onToggleFavorite?.(game.ExternalId)
-  }
-
   return (
     <div className='rounded-xl group cursor-pointer overflow-hidden' onClick={handlePlayNow} onContextMenu={() => onToggleFavorite?.(game.ExternalId)}>
       <div className='relative group-hover:shadow-xl group-hover:shadow-accent/10 rounded-xl transition-all duration-300 bg-cover bg-left h-48 group-hover:bg-right pointer-events-none'

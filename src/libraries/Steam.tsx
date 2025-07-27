@@ -1,7 +1,6 @@
 import { Game, gameMock, Library } from "./Library";
 import {
-    parse,
-    stringify,
+    parse
 } from '@node-steam/vdf';
 
 interface SteamVDF {

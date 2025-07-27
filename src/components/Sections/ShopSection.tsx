@@ -1,7 +1,3 @@
-import CategoryCard from '../CategoryCard'
-
-
-
 export default function ShopSection() {
   return (
     <div className="space-y-6">

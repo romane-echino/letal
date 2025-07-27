@@ -14,7 +14,7 @@ export default function GamesSection({ games }: GamesSectionProps) {
   const [currentSort, setCurrentSort] = useState<SortOption>('recent')
   const [sortedGames, setSortedGames] = useState<Game[]>(games)
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
-  const { favorites, toggleFavorite, isFavorite } = useFavorites()
+  const { favorites, toggleFavorite } = useFavorites()
 
   useEffect(() => {
     let sortedGames = sortGames(games, currentSort);
@@ -32,29 +32,44 @@ export default function GamesSection({ games }: GamesSectionProps) {
     setSortedGames(sortedGames)
   }, [games, currentSort, sortDirection, favorites])
 
+  const favoriteGames = sortedGames.filter(game => game.isFavorite)
+  const regularGames = sortedGames.filter(game => !game.isFavorite)
+
   return (
     <div className="space-y-6">
-
-      {favorites.length > 0 && (
+      {/* Favorites Section */}
+      {favoriteGames.length > 0 && (
         <>
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-white font-quicksand">Favorites</h2>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {sortedGames.filter(game => game.isFavorite).map((game, index) => (
-            <GameCard
-              key={game.ExternalId}
-              game={game}
-              onToggleFavorite={toggleFavorite}
-            />
-          ))}
-        </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <h2 className="text-2xl font-bold text-white font-quicksand">Favoris</h2>
+              <span className="text-white/50 text-sm">
+                {favoriteGames.length} jeu{favoriteGames.length > 1 ? 'x' : ''} favori{favoriteGames.length > 1 ? 's' : ''}
+              </span>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {favoriteGames.map((game) => (
+              <GameCard
+                key={game.ExternalId}
+                game={game}
+                onToggleFavorite={toggleFavorite}
+              />
+            ))}
+          </div>
         </>
       )}
 
-
+      {/* All Games Section */}
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-white font-quicksand">My games</h2>
+        <div className="flex items-center gap-4">
+          <h2 className="text-2xl font-bold text-white font-quicksand">Mes jeux</h2>
+          {games.length > 0 && (
+            <span className="text-white/50 text-sm">
+              {games.length} jeu{games.length > 1 ? 'x' : ''} trouvé{games.length > 1 ? 's' : ''}
+            </span>
+          )}
+        </div>
         <div className='flex items-center gap-2'>
           <div className='px-4 py-2 h-10 bg-white/10 backdrop-blur-xl rounded-lg text-white hover:bg-white/20 transition-all duration-200 flex items-center justify-center cursor-pointer'
             onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')}>
@@ -68,15 +83,21 @@ export default function GamesSection({ games }: GamesSectionProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {sortedGames.filter(game => !game.isFavorite).map((game, index) => (
-          <GameCard
-            key={game.ExternalId}
-            game={game}
-            onToggleFavorite={toggleFavorite}
-          />
-        ))}
-      </div>
+      {games.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-white/50">Aucun jeu trouvé</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {regularGames.map((game) => (
+            <GameCard
+              key={game.ExternalId}
+              game={game}
+              onToggleFavorite={toggleFavorite}
+            />
+          ))}
+        </div>
+      )}
     </div>
   )
 } 

@@ -1,14 +1,9 @@
 import { 
-  PlayIcon, 
   ShoppingBagIcon, 
-  UserIcon,
-  CogIcon,
-  ArrowRightOnRectangleIcon,
   XMarkIcon,
   BookOpenIcon
 } from '@heroicons/react/24/outline'
 import { House } from 'lucide-react'
-import { Menu, Transition } from '@headlessui/react'
 
 interface SidebarProps {
   sidebarOpen: boolean
@@ -31,7 +26,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen, activeSection, se
         <div className="flex items-center justify-between h-16 px-6 border-b border-white/10 drag-handle">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center animate-glow">
-              <PlayIcon className="w-5 h-5 text-white" />
+              <img src="../assets/logo.png" alt="Letal" className='w-full h-full object-cover' />
             </div>
             <span className="text-2xl font-normal text-white font-bebas">Letal</span>
           </div>

@@ -1,4 +1,4 @@
-import { Loader2, Gamepad2 } from 'lucide-react'
+import { Gamepad2 } from 'lucide-react'
 
 interface LoadingScreenProps {
   message?: string
@@ -12,7 +12,6 @@ export default function LoadingScreen({ message = "Chargement des jeux...", prog
         {/* Animated icon */}
         <div className="relative">
           <Gamepad2 className="w-16 h-16 text-accent mx-auto animate-bounce" />
-          <Loader2 className="w-8 h-8 text-white/50 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-spin" />
         </div>
 
         {/* Loading message */}

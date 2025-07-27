@@ -70,11 +70,13 @@ class GameStore {
 
       console.log(`Total games loaded: ${allGames.length}`)
       
-      this.setState({
-        games: allGames,
-        isLoading: false,
-        lastUpdated: new Date()
-      })
+      setTimeout(() => {
+        this.setState({
+          games: allGames,
+          isLoading: false,
+          lastUpdated: new Date()
+        })
+      }, 1000)
     } catch (error) {
       console.error('Error loading games:', error)
       this.setState({
@@ -99,12 +101,12 @@ class GameStore {
   }
 
   // Get games by library
-  getGamesByLibrary(libraryName: string): Game[] {
+ /* getGamesByLibrary(libraryName: string): Game[] {
     return this.state.games.filter(game => {
       // This is a simplified filter - you might want to add a library property to Game
       return true // For now, return all games
     })
-  }
+  }*/
 
   // Get favorite games
   getFavoriteGames(): Game[] {
