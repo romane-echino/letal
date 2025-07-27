@@ -1,5 +1,5 @@
 {
-  "name": "react-ts-vite-app",
+  "name": "letal-gamehub",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -45,10 +45,10 @@
     "wait-on": "^8.0.1"
   },
   "build": {
-    "appId": "com.gamehub.app",
-    "productName": "GameHub",
+    "appId": "com.letal.app",
+    "productName": "Letal",
     "directories": {
-      "output": "dist-electron"
+      "output": "dist"
     },
     "files": [
       "dist/**/*",
