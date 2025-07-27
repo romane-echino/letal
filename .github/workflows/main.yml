@@ -2,7 +2,10 @@ name: Build Electron App
 
 on:
   push:
-    branches: [ main ]  # ou master selon ta branche
+    branches: [ main ]  # adapte si tu travailles sur une autre branche
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -17,16 +20,18 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build Electron app
         run: npm run build
 
-      - name: Upload Release Artifact
-        uses: actions/upload-artifact@v3
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
         with:
-          name: LETAL-installer
+          name: letal-installer
           path: dist/*.exe
+          compression-level: 9
+          if-no-files-found: error
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
