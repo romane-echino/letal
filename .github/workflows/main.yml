@@ -40,4 +40,4 @@ jobs:
           name: "Release v${{ github.run_number }}"
           files: dist/*.exe
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
