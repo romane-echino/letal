@@ -1,0 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Quicksand:wght@300..700&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #0d171f;
+  --color-secondary: #15202c;
+  --color-accent: #5c44f5;
+  --color-text: #ffffff;
+
+  --font-bebas: 'Bebas Neue', sans-serif;
+  --font-quicksand: 'Quicksand', sans-serif;
+}
+
+.drag-handle {
+  -webkit-app-region: drag;
+}
+
+*{
+  user-select: none;
+}
