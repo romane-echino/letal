@@ -33,3 +33,5 @@ release/
 *.rpm
 *.AppImage
 *.snap
+
+.env
