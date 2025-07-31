@@ -5,6 +5,7 @@ import GamesSection from './components/Sections/GamesSection'
 import ShopSection from './components/Sections/ShopSection'
 import { useGameStore } from './stores/GameStore'
 import LoadingScreen from './components/LoadingScreen'
+import { UpdateNotification } from './components/UpdateNotification'
 
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -53,18 +54,21 @@ export default function App() {
   }
 
   return (
-    <Layout
-      sidebarOpen={sidebarOpen}
-      setSidebarOpen={setSidebarOpen}
-      activeSection={activeSection}
-    >
-      <Sidebar
+    <>
+      <Layout
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
         activeSection={activeSection}
-        setActiveSection={setActiveSection}
-      />
-      {renderContent()}
-    </Layout>
+      >
+        <Sidebar
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+          activeSection={activeSection}
+          setActiveSection={setActiveSection}
+        />
+        {renderContent()}
+      </Layout>
+      <UpdateNotification />
+    </>
   )
 }

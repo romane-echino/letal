@@ -2,9 +2,14 @@ const { app, BrowserWindow, Menu, shell, ipcMain } = require('electron')
 const path = require('path')
 const fs = require('fs').promises
 const { spawn } = require('child_process')
+const { autoUpdater } = require('electron-updater')
 
 // Better development detection
 const isDev = !app.isPackaged && process.env.NODE_ENV !== 'production'
+
+// Configure auto-updater
+autoUpdater.autoDownload = false
+autoUpdater.autoInstallOnAppQuit = true
 
 // Keep a global reference of the window object
 let mainWindow
@@ -167,6 +172,108 @@ ipcMain.handle('launch-app', async (event, appPath) => {
   }
 })
 
+// Auto-updater event handlers
+ipcMain.handle('check-for-updates', async () => {
+  try {
+    if (isDev) {
+      console.log('Skipping update check in development mode')
+      return { available: false, message: 'Development mode - no updates checked' }
+    }
+    
+    console.log('Checking for updates...')
+    const result = await autoUpdater.checkForUpdates()
+    return { available: !!result, message: 'Update check completed' }
+  } catch (error) {
+    console.error('Error checking for updates:', error)
+    return { available: false, error: error.message }
+  }
+})
+
+ipcMain.handle('download-update', async () => {
+  try {
+    console.log('Downloading update...')
+    const result = await autoUpdater.downloadUpdate()
+    return { success: true, message: 'Update downloaded successfully' }
+  } catch (error) {
+    console.error('Error downloading update:', error)
+    return { success: false, error: error.message }
+  }
+})
+
+ipcMain.handle('install-update', async () => {
+  try {
+    console.log('Installing update...')
+    autoUpdater.quitAndInstall()
+    return { success: true, message: 'Update installation initiated' }
+  } catch (error) {
+    console.error('Error installing update:', error)
+    return { success: false, error: error.message }
+  }
+})
+
+// Auto-updater event listeners
+autoUpdater.on('checking-for-update', () => {
+  console.log('Checking for update...')
+  if (mainWindow) {
+    mainWindow.webContents.send('update-status', { status: 'checking', message: 'Vérification des mises à jour...' })
+  }
+})
+
+autoUpdater.on('update-available', (info) => {
+  console.log('Update available:', info)
+  if (mainWindow) {
+    mainWindow.webContents.send('update-status', { 
+      status: 'available', 
+      message: 'Mise à jour disponible', 
+      info 
+    })
+  }
+})
+
+autoUpdater.on('update-not-available', (info) => {
+  console.log('Update not available:', info)
+  if (mainWindow) {
+    mainWindow.webContents.send('update-status', { 
+      status: 'not-available', 
+      message: 'Aucune mise à jour disponible', 
+      info 
+    })
+  }
+})
+
+autoUpdater.on('error', (err) => {
+  console.error('Auto-updater error:', err)
+  if (mainWindow) {
+    mainWindow.webContents.send('update-status', { 
+      status: 'error', 
+      message: 'Erreur lors de la vérification des mises à jour', 
+      error: err.message 
+    })
+  }
+})
+
+autoUpdater.on('download-progress', (progressObj) => {
+  console.log('Download progress:', progressObj)
+  if (mainWindow) {
+    mainWindow.webContents.send('update-status', { 
+      status: 'downloading', 
+      message: 'Téléchargement en cours...', 
+      progress: progressObj 
+    })
+  }
+})
+
+autoUpdater.on('update-downloaded', (info) => {
+  console.log('Update downloaded:', info)
+  if (mainWindow) {
+    mainWindow.webContents.send('update-status', { 
+      status: 'downloaded', 
+      message: 'Mise à jour téléchargée et prête à installer', 
+      info 
+    })
+  }
+})
+
 // Supprimer complètement le menu
 const template = []
 
@@ -181,6 +288,15 @@ app.whenReady().then(() => {
 
   // Supprimer le menu complètement
   Menu.setApplicationMenu(null)
+
+  // Initialize auto-updater (only in production)
+  if (!isDev) {
+    console.log('Initializing auto-updater...')
+    // Check for updates on app start
+    setTimeout(() => {
+      autoUpdater.checkForUpdates()
+    }, 3000) // Wait 3 seconds after app start
+  }
 
   app.on('activate', () => {
     // On macOS it's common to re-create a window in the app when the

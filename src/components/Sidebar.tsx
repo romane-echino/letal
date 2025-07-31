@@ -20,7 +20,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen, activeSection, se
   ]
 
   return (
-    <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-secondary backdrop-blur-xl transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+    <div className={`fixed  inset-y-0 left-0 z-50 w-64 bg-secondary backdrop-blur-xl transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0 opacity-100' : '-translate-x-full lg:translate-x-0'}`}>
       <div className="flex flex-col h-full">
         {/* Logo */}
         <div className="flex items-center justify-between h-16 px-6 border-b border-white/10 drag-handle">
@@ -32,7 +32,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen, activeSection, se
           </div>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden p-2 rounded-md text-white/70 hover:text-white hover:bg-white/10 transition-all duration-200"
+            className="cursor-pointer lg:hidden p-2 rounded-md text-white/70 hover:text-white hover:bg-white/10 transition-all duration-200"
           >
             <XMarkIcon className="w-6 h-6" />
           </button>

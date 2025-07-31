@@ -24,6 +24,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Application launching
   launchApp: (path) => ipcRenderer.invoke('launch-app', path),
   
+  // Auto-updater functions
+  checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
+  downloadUpdate: () => ipcRenderer.invoke('download-update'),
+  installUpdate: () => ipcRenderer.invoke('install-update'),
+  onUpdateStatus: (callback) => ipcRenderer.on('update-status', callback),
+  
   // Example: Send a message to the main process
   sendMessage: (message) => ipcRenderer.send('message', message),
   
