@@ -25,7 +25,7 @@ jobs:
       - name: Build Electron app
         run: npm run electron-pack
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Upload installer
         uses: actions/upload-artifact@v4
@@ -42,4 +42,4 @@ jobs:
           name: "Release v${{ github.run_number }}"
           files: dist/*.exe
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}

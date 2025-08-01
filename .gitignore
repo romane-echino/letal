@@ -35,3 +35,4 @@ release/
 *.snap
 
 .env
+AUTO_UPDATE.md

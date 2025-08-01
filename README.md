@@ -12,13 +12,13 @@
 
 - Working searchbar (CTRL+K Popup)
 - Integrate other local game providers 
-- Store to displays weekly monthly best games 
+- Store to displays weekly monthly best games (via metacritics or others)
 - Auto updater
 - Better "Add to favorite UI"
 - Better "Launch game" UI
 - I18n
-- Favorite games in context menu
-- View all game libraries (filter by and activate)
+- Favorite games in app context menu
+- View all game libraries (filter by and activate) (Origin/EA, Steam, Ubi)
 - Library auth broken to retrieve supplementary informations
 
 
@@ -32,7 +32,7 @@
 ## 🖼️ Releases
 
 ### v0.0.2
-- Auto updater begin
+- Auto updater
 
 ### v0.0.1
 - Working steam local game browsing
