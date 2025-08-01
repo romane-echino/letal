@@ -62,7 +62,7 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "RomaneDonnet",
+      "owner": "romane-echino",
       "repo": "letal"
     },
     "mac": {
