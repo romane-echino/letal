@@ -1,7 +1,7 @@
 const { app, BrowserWindow, Menu, shell, ipcMain } = require('electron')
 const path = require('path')
 const fs = require('fs').promises
-const { spawn } = require('child_process')
+const { spawn, exec } = require('child_process')
 const { autoUpdater } = require('electron-updater')
 
 // Better development detection
@@ -19,8 +19,8 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
-    minWidth: 800,
-    minHeight: 600,
+    minWidth: 420,
+    minHeight: 640,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -57,7 +57,7 @@ function createWindow() {
     const distPath = path.join(__dirname, '../dist/index.html')
     console.log('Loading from:', distPath)
     mainWindow.loadFile(distPath)
-    mainWindow.webContents.openDevTools(); // Commenté pour la production
+    //mainWindow.webContents.openDevTools(); // Commenté pour la production
   }
 
   // Show window when ready
@@ -146,6 +146,65 @@ ipcMain.handle('fs-read-dir', async (event, dirPath) => {
     return []
   }
 })
+
+// Registry reading event handler
+ipcMain.handle('read-registry', async (event, registryPath) => {
+  return new Promise((resolve, reject) => {
+    // Utiliser reg query pour lire le registre Windows
+    const command = `reg query "${registryPath}" /s`
+    
+    exec(command, { encoding: 'utf8' }, (error, stdout, stderr) => {
+      if (error) {
+        console.error('Error reading registry:', error)
+        console.error('stderr:', stderr)
+        resolve({ success: false, error: error.message, data: null })
+        return
+      }
+      
+      try {
+        // Parser la sortie du registre
+        const registryData = parseRegistryOutput(stdout)
+        resolve({ success: true, data: registryData, error: null })
+      } catch (parseError) {
+        console.error('Error parsing registry output:', parseError)
+        resolve({ success: false, error: parseError.message, data: null })
+      }
+    })
+  })
+})
+
+// Fonction pour parser la sortie du registre
+function parseRegistryOutput(output) {
+  const lines = output.split('\n').filter(line => line.trim())
+  const result = {}
+  let currentKey = null
+  
+  for (const line of lines) {
+    const trimmedLine = line.trim()
+    
+    // Détecter une nouvelle clé de registre
+    if (trimmedLine.startsWith('HKEY_')) {
+      currentKey = trimmedLine
+      result[currentKey] = {}
+      continue
+    }
+    
+    // Détecter une valeur de registre
+    if (trimmedLine.includes('    ') && currentKey) {
+      const parts = trimmedLine.split('    ')
+      if (parts.length >= 2) {
+        const valueName = parts[0].trim()
+        const valueData = parts.slice(1).join('    ').trim()
+        
+        if (valueName && valueData) {
+          result[currentKey][valueName] = valueData
+        }
+      }
+    }
+  }
+  
+  return result
+}
 
 // Application launching event handler
 ipcMain.handle('launch-app', async (event, appPath) => {

@@ -16,6 +16,9 @@ interface ElectronAPI {
   readFile: (path: string) => Promise<string | null>
   readDirectory: (path: string) => Promise<string[]>
   
+  // Registry operations
+  readRegistry: (registryPath: string) => Promise<{ success: boolean; data: any; error: string | null }>
+  
   // Application launching
   launchApp: (path: string) => Promise<{ success: boolean; message: string; error?: string }>
   

@@ -10,12 +10,29 @@
 
   --font-bebas: 'Bebas Neue', sans-serif;
   --font-quicksand: 'Quicksand', sans-serif;
+
+  --breakpoint-xs: 30rem;
 }
 
-.drag-handle {
+
+
+.drag {
   -webkit-app-region: drag;
 }
 
-*{
-  user-select: none;
+.no-drag {
+  user-select: auto !important;
+  -webkit-app-region: no-drag !important;
+}
+
+.scroll {
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  scrollbar-color: var(--color-accent) var(--color-primary);
+}
+
+.scroll::-webkit-scrollbar {
+  width: 8px;
+  background-color: var(--color-primary);
 }

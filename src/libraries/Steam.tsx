@@ -1,3 +1,4 @@
+import { SteamIcon } from "./icons/steam";
 import { Game, gameMock, Library } from "./Library";
 import {
     parse
@@ -24,6 +25,10 @@ interface SteamACF {
 }
 
 export class Steam implements Library {
+    Name: string = "Steam";
+    Logo: React.ReactNode = <SteamIcon />;
+    Colors: string[] = ['#174051', '#1b2838'];
+    
     async List(): Promise<Game[]> {
         console.log('Listing Steam games...');
         let result: Game[] = [];
@@ -75,6 +80,7 @@ export class Steam implements Library {
                         ExternalId: appId,
                         SizeOnDisk: acfJson.AppState.SizeOnDisk,
                         LastPlayed: acfJson.AppState.LastPlayed,
+                        Library: this.Name
                     });
                 }
             }

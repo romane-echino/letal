@@ -21,6 +21,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   readFile: (path) => ipcRenderer.invoke('fs-read-file', path),
   readDirectory: (path) => ipcRenderer.invoke('fs-read-dir', path),
   
+  // Registry operations
+  readRegistry: (registryPath) => ipcRenderer.invoke('read-registry', registryPath),
+  
   // Application launching
   launchApp: (path) => ipcRenderer.invoke('launch-app', path),
   

@@ -17,9 +17,11 @@
 - Better "Add to favorite UI"
 - Better "Launch game" UI
 - I18n
+- Layout update
 - Favorite games in app context menu
 - View all game libraries (filter by and activate) (Origin/EA, Steam, Ubi)
 - Library auth broken to retrieve supplementary informations
+- Letal Icon
 
 
 ## 🪳 Bugs
@@ -30,6 +32,12 @@
 
 
 ## 🖼️ Releases
+
+### v0.0.3
+- App Icon
+- Layout update
+- Search feature
+- Local provider integration (Xbox, Ubisoft, Blizzard, EA, Minecraft, Steam)
 
 ### v0.0.2
 - Auto updater

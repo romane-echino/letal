@@ -3,16 +3,27 @@ import { useFavorites } from '../hooks/useFavorites'
 import { useState, useEffect } from 'react'
 
 interface GameStoreState {
-  games: Game[]
+  games: Game[],
+  libraries: GameStoreLibrary[],
   isLoading: boolean
   error: string | null
   lastUpdated: Date | null
 }
 
+
+export interface GameStoreLibrary {
+  name: string,
+  logo: React.ReactNode,
+  colors: string[],
+  games: Game[],
+}
+
+
 class GameStore {
   private static instance: GameStore
   private state: GameStoreState = {
     games: [],
+    libraries: [],
     isLoading: false,
     error: null,
     lastUpdated: null
@@ -61,6 +72,14 @@ class GameStore {
         try {
           console.log(`Loading games from ${library.constructor.name}...`)
           const gamesFromLibrary = await library.List()
+          this.setState({
+            libraries: [...this.state.libraries, {
+              name: library.constructor.name,
+              logo: library.Logo,
+              games: gamesFromLibrary,
+              colors: library.Colors
+            }]
+          })
           allGames.push(...gamesFromLibrary)
           console.log(`Loaded ${gamesFromLibrary.length} games from ${library.constructor.name}`)
         } catch (error) {
