@@ -1,6 +1,7 @@
 import { Game, LibraryList } from '../libraries/Library'
 import { useFavorites } from '../hooks/useFavorites'
 import { useState, useEffect } from 'react'
+import { captureError, captureMessage, setTag } from '../utils/sentry'
 
 interface GameStoreState {
   games: Game[],
@@ -31,6 +32,33 @@ class GameStore {
   private listeners: Set<(state: GameStoreState) => void> = new Set()
 
   private constructor() {}
+
+  // Méthode utilitaire pour capturer les erreurs Sentry
+  private captureStoreError(error: unknown, context: string, additionalData?: Record<string, any>) {
+    const errorObj = error instanceof Error ? error : new Error(String(error))
+    
+    captureError(errorObj, {
+      context: `GameStore - ${context}`,
+      storeState: {
+        gamesCount: this.state.games.length,
+        librariesCount: this.state.libraries.length,
+        isLoading: this.state.isLoading,
+        hasError: !!this.state.error,
+        lastUpdated: this.state.lastUpdated?.toISOString()
+      },
+      ...additionalData
+    })
+  }
+
+  // Méthode utilitaire pour capturer les actions du store
+  private captureStoreAction(action: string, data?: Record<string, any>) {
+    captureMessage(`GameStore: ${action}`, 'info')
+    if (data) {
+      Object.entries(data).forEach(([key, value]) => {
+        setTag(`action_${key}`, String(value))
+      })
+    }
+  }
 
   static getInstance(): GameStore {
     if (!GameStore.instance) {
@@ -64,14 +92,41 @@ class GameStore {
 
     this.setState({ isLoading: true, error: null })
 
+    // Capturer le début du chargement
+    this.captureStoreAction('Starting games loading process', { operation: 'games_load' })
+
     try {
       console.log('Loading games from all libraries...')
       let allGames: Game[] = []
+      let successfulLibraries = 0
+      let failedLibraries = 0
 
       for (const library of LibraryList) {
         try {
           console.log(`Loading games from ${library.constructor.name}...`)
-          const gamesFromLibrary = await library.List()
+          let gamesFromLibrary: Game[] = [];
+          
+          try {
+            gamesFromLibrary = await library.List()
+            successfulLibraries++
+            
+            // Capturer le succès de chaque bibliothèque
+            captureMessage(`GameStore: Successfully loaded ${gamesFromLibrary.length} games from ${library.constructor.name}`, 'info')
+            setTag(`library_${library.constructor.name.toLowerCase()}`, 'success')
+            
+          } catch (error) {
+            failedLibraries++
+            console.error(`Error loading games from ${library.constructor.name}:`, error)
+            
+            // Capturer l'erreur de chaque bibliothèque
+            this.captureStoreError(error, 'Library Loading Error', {
+              library: library.constructor.name,
+              gamesLoaded: gamesFromLibrary.length,
+              errorType: 'library_load_failed'
+            })
+            setTag(`library_${library.constructor.name.toLowerCase()}`, 'failed')
+          }
+          
           this.setState({
             libraries: [...this.state.libraries, {
               name: library.constructor.name,
@@ -82,12 +137,27 @@ class GameStore {
           })
           allGames.push(...gamesFromLibrary)
           console.log(`Loaded ${gamesFromLibrary.length} games from ${library.constructor.name}`)
+          
         } catch (error) {
+          failedLibraries++
           console.error(`Error loading games from ${library.constructor.name}:`, error)
+          
+          // Capturer l'erreur de configuration de bibliothèque
+          this.captureStoreError(error, 'Library Configuration Error', {
+            library: library.constructor.name,
+            errorType: 'library_config_failed'
+          })
+          setTag(`library_${library.constructor.name.toLowerCase()}`, 'config_failed')
         }
       }
 
       console.log(`Total games loaded: ${allGames.length}`)
+      
+      // Capturer les statistiques finales
+      captureMessage(`GameStore: Loading completed - ${allGames.length} total games, ${successfulLibraries} successful libraries, ${failedLibraries} failed libraries`, 'info')
+      setTag('total_games_loaded', allGames.length.toString())
+      setTag('successful_libraries', successfulLibraries.toString())
+      setTag('failed_libraries', failedLibraries.toString())
       
       setTimeout(() => {
         this.setState({
@@ -96,8 +166,15 @@ class GameStore {
           lastUpdated: new Date()
         })
       }, 1000)
+      
     } catch (error) {
       console.error('Error loading games:', error)
+      
+      // Capturer l'erreur générale de chargement
+      this.captureStoreError(error, 'General Loading Error', {
+        errorType: 'general_load_failed'
+      })
+      
       this.setState({
         error: error instanceof Error ? error.message : 'Unknown error',
         isLoading: false
@@ -135,24 +212,72 @@ class GameStore {
 
   // Get games by search term
   searchGames(searchTerm: string): Game[] {
-    const term = searchTerm.toLowerCase()
-    return this.state.games.filter(game => 
-      game.Name?.toLowerCase().includes(term) ||
-      game.ExternalId.toLowerCase().includes(term)
-    )
+    try {
+      const term = searchTerm.toLowerCase()
+      const results = this.state.games.filter(game => 
+        game.Name?.toLowerCase().includes(term) ||
+        game.ExternalId.toLowerCase().includes(term)
+      )
+      
+      // Capturer les statistiques de recherche
+      captureMessage(`GameStore: Search performed for "${searchTerm}" - ${results.length} results found`, 'info')
+      setTag('search_term', searchTerm)
+      setTag('search_results_count', results.length.toString())
+      setTag('total_games_available', this.state.games.length.toString())
+      
+      return results
+    } catch (error) {
+      captureError(error instanceof Error ? error : new Error(String(error)), {
+        context: 'GameStore - Search Error',
+        searchTerm,
+        errorType: 'search_failed'
+      })
+      return []
+    }
   }
 
   // Refresh games
   async refreshGames(): Promise<void> {
-    await this.loadGames()
+    try {
+      captureMessage('GameStore: Starting games refresh', 'info')
+      setTag('operation', 'games_refresh')
+      
+      await this.loadGames()
+      
+      captureMessage('GameStore: Games refresh completed successfully', 'info')
+    } catch (error) {
+      captureError(error instanceof Error ? error : new Error(String(error)), {
+        context: 'GameStore - Refresh Error',
+        errorType: 'refresh_failed'
+      })
+      throw error
+    }
   }
 
   // Clear games
   clearGames(): void {
-    this.setState({
-      games: [],
-      lastUpdated: null
-    })
+    try {
+      const gamesCount = this.state.games.length
+      const librariesCount = this.state.libraries.length
+      
+      captureMessage(`GameStore: Clearing ${gamesCount} games and ${librariesCount} libraries`, 'info')
+      setTag('operation', 'games_clear')
+      setTag('games_cleared', gamesCount.toString())
+      setTag('libraries_cleared', librariesCount.toString())
+      
+      this.setState({
+        games: [],
+        lastUpdated: null
+      })
+      
+      captureMessage('GameStore: Games cleared successfully', 'info')
+    } catch (error) {
+      captureError(error instanceof Error ? error : new Error(String(error)), {
+        context: 'GameStore - Clear Error',
+        errorType: 'clear_failed'
+      })
+      throw error
+    }
   }
 }
 

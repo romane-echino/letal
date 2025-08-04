@@ -31,6 +31,7 @@ export const useAutoUpdater = () => {
         })
       }
     } catch (error) {
+      console.error('Error checking for updates:', error)
       setUpdateStatus({ 
         status: 'error', 
         message: 'Erreur lors de la vérification', 

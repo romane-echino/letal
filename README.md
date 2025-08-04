@@ -7,6 +7,7 @@
 - **Styling**: Tailwind CSS
 - **UI Components**: HeadlessUI + Lucide
 - **Desktop**: Electron
+- **Logging**: Sentry
 
 ## 🛣️ Roadmap
 
@@ -22,13 +23,16 @@
 - View all game libraries (filter by and activate) (Origin/EA, Steam, Ubi)
 - Library auth broken to retrieve supplementary informations
 - Letal Icon
+- Log system (Sentry)
 
 
 ## 🪳 Bugs
 
-- Sidebar sometimes under the blurry overylay
-- Buttons are sometimes unclickable
-- App logo not showing
+- Sidebar sometimes under the blurry overylay [Fixed 0.0.3]
+- Buttons are sometimes unclickable [Fixed 0.0.3]
+- App logo not showing [Fixed 0.0.3]
+- Auto updater error
+- Game browsing crashing the app
 
 
 ## 🖼️ Releases

@@ -15,6 +15,7 @@ import { ScrollContent } from './parts/scrollContent'
 import { SearchOverlay } from './parts/searchOverlay'
 import { LibrariesPage } from './pages/libraries'
 import GamePage from './pages/games'
+import { captureError, captureMessage } from './utils/sentry'
 
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -40,6 +41,17 @@ export default function App() {
       }
     }
   }, [games.length, isLoading, loadGames])
+
+  // Capturer les erreurs de chargement des jeux
+  useEffect(() => {
+    if (error) {
+      captureError(new Error(error), {
+        context: 'App - Game Loading Error',
+        gamesCount: games.length,
+        isLoading,
+      });
+    }
+  }, [error, games.length, isLoading]);
 
 
   const openSearch = () => {

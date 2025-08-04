@@ -4,6 +4,16 @@ const fs = require('fs').promises
 const { spawn, exec } = require('child_process')
 const { autoUpdater } = require('electron-updater')
 
+// Charger la configuration sécurisée
+const { loadSecureConfig, validateConfig } = require('./config')
+
+// Charger la configuration au démarrage
+const secureConfig = loadSecureConfig()
+if (!validateConfig(secureConfig)) {
+  console.error('Configuration invalide, arrêt de l\'application')
+  app.quit()
+}
+
 // Better development detection
 const isDev = !app.isPackaged && process.env.NODE_ENV !== 'production'
 

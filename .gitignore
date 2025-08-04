@@ -36,3 +36,5 @@ release/
 
 .env
 AUTO_UPDATE.md
+SENTRY_SETUP.md
+SECURITY_GUIDE.md
